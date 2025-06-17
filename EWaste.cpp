@@ -1,6 +1,4 @@
 #include <iostream>
-#include <vector>
-
 using namespace std;
 
 class ElectronicItem {
@@ -25,9 +23,8 @@ public:
         cout << "Origin City: " << originCity << endl;
     }
 
-    virtual ~ElectronicItem() {}  
+    virtual ~ElectronicItem() {}
 };
-
 
 class HomeAppliance : public ElectronicItem {
     float powerRating;
@@ -54,7 +51,6 @@ public:
     }
 };
 
-
 class MobileDevice : public ElectronicItem {
     int batteryCapacity;
     bool hasScreenCrack;
@@ -80,9 +76,10 @@ public:
     }
 };
 
-
 int main() {
-    vector<ElectronicItem*> items;
+    const int MAX_ITEMS = 100;
+    ElectronicItem* items[MAX_ITEMS];
+    int count = 0;
     int choice;
 
     do {
@@ -98,28 +95,36 @@ int main() {
 
         switch (choice) {
             case 1: {
-                ElectronicItem* item = new HomeAppliance();
-                item->input();
-                items.push_back(item);
+                if (count < MAX_ITEMS) {
+                    items[count] = new HomeAppliance();
+                    items[count]->input();
+                    count++;
+                } else {
+                    cout << "Item limit reached!" << endl;
+                }
                 break;
             }
             case 2: {
-                ElectronicItem* item = new MobileDevice();
-                item->input();
-                items.push_back(item);
+                if (count < MAX_ITEMS) {
+                    items[count] = new MobileDevice();
+                    items[count]->input();
+                    count++;
+                } else {
+                    cout << "Item limit reached!" << endl;
+                }
                 break;
             }
             case 3: {
                 cout << "\n--- All Electronic Items ---\n";
-                for (auto* item : items) {
-                    item->display();
+                for (int i = 0; i < count; i++) {
+                    items[i]->display();
                 }
                 break;
             }
             case 4: {
                 cout << "\n--- Mobile Devices with Battery > 3000 mAh ---\n";
-                for (auto* item : items) {
-                    MobileDevice* md = dynamic_cast<MobileDevice*>(item);
+                for (int i = 0; i < count; i++) {
+                    MobileDevice* md = dynamic_cast<MobileDevice*>(items[i]);
                     if (md && md->getBatteryCapacity() > 3000) {
                         md->display();
                     }
@@ -127,14 +132,14 @@ int main() {
                 break;
             }
             case 5: {
-                int count = 0;
-                for (auto* item : items) {
-                    HomeAppliance* ha = dynamic_cast<HomeAppliance*>(item);
+                int haCount = 0;
+                for (int i = 0; i < count; i++) {
+                    HomeAppliance* ha = dynamic_cast<HomeAppliance*>(items[i]);
                     if (ha && ha->getRecyclablePlasticPercent() > 70) {
-                        count++;
+                        haCount++;
                     }
                 }
-                cout << "Count of Home Appliances with >70% recyclable plastic: " << count << endl;
+                cout << "Home Appliances with >70% recyclable plastic: " << haCount << endl;
                 break;
             }
             case 6: {
@@ -142,14 +147,13 @@ int main() {
                 break;
             }
             default:
-                cout << "Invalid choice! Try again." << endl;
+                cout << "Invalid choice!" << endl;
         }
 
-    } while (choice != 0);
+    } while (choice != 6);
 
-   
-    for (auto* item : items) {
-        delete item;
+    for (int i = 0; i < count; i++) {
+        delete items[i];
     }
 
     return 0;
